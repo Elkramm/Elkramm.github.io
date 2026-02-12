@@ -130,10 +130,10 @@
     function growYes() {
       // ✅ croissance agressive
       // Après 7 fuites : ~ 1 + 7*0.45 = 4.15 (ENORME)
-      yesScale += 0.25;
+      yesScale += 0.1;
 
       // Optionnel: plafond très haut (évite un scale absurde si tu changes maxDodges)
-      if (yesScale > 4) yesScale = 4;
+      if (yesScale > 3) yesScale = 3;
 
       yesBtn.style.transform = `scale(${yesScale})`;
       // petit bonus: plus ça grossit, plus c’est “important”
@@ -165,7 +165,7 @@
           "😅 Attends attends…",
           "🥺 Mais pourquoi non…",
           "🤭 Tu insistes hein !",
-          "😌 En vrai ton consetement je vais m'en passer."
+          "😌 En vrai ton consentement je vais m'en passer."
         ];
         show(lines[Math.min(tries - 1, lines.length - 1)]);
       }
