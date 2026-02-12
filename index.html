@@ -24,21 +24,37 @@
     }
     h1{ margin:0 0 10px; font-size: clamp(24px, 4.2vw, 38px); }
     p{ margin:0 0 18px; font-size: 16px; line-height:1.45; }
-    .stage{ position:relative; height:170px; }
+
+    .stage{ position:relative; height:190px; } /* un peu plus haut pour laisser “Oui” grossir */
     .buttons{
       position:absolute; inset:0;
       display:flex; gap:14px; justify-content:center; align-items:center;
       flex-wrap:wrap;
     }
+
     button{
       border:0; padding:12px 18px; border-radius:999px; cursor:pointer;
       font-weight:800; font-size:16px;
-      transition: transform .2s ease, box-shadow .15s ease;
+      transition: transform .22s ease, box-shadow .15s ease;
       user-select:none;
+      transform-origin: center;
+      -webkit-tap-highlight-color: transparent;
     }
     button:hover{ box-shadow: 0 10px 18px rgba(0,0,0,.10); }
-    .yes{ background:#ff2f74; color:#fff; }
-    .no{ background:#f2f2f2; color:#333; position:absolute; }
+
+    .yes{
+      background:#ff2f74; color:#fff;
+      position:relative;
+      z-index: 5;              /* ✅ Oui au-dessus */
+      padding: 14px 22px;      /* ✅ un peu plus “costaud” de base */
+    }
+
+    .no{
+      background:#f2f2f2; color:#333;
+      position:absolute;
+      z-index: 2;              /* ✅ Non en dessous */
+    }
+
     .msg{
       margin-top:14px;
       padding:12px 14px;
@@ -48,12 +64,14 @@
       display:none;
       text-align:left;
     }
+
     .sparkle{
       position:absolute; inset:auto -60px -60px auto;
       width:180px; height:180px; background:#ffd0e2;
       border-radius: 36px; transform: rotate(18deg);
       opacity:.55;
     }
+
     .tiny{ transform: scale(.92); }
     .smaller{ transform: scale(.84); }
     .mini{ transform: scale(.76); }
@@ -61,7 +79,7 @@
 </head>
 <body>
   <div class="card">
-    <div class="sparkle"></div>
+    <div class="sparkle" aria-hidden="true"></div>
 
     <h1>Tu veux être ma Valentine ? 💘</h1>
     <p>Promis c’est une question sérieuse… avec un site un peu pas sérieux 😇</p>
@@ -70,7 +88,7 @@
       <div class="buttons">
         <button class="yes" id="yesBtn">Oui 😍</button>
         <button class="no" id="noBtn"
-          style="left: calc(50% + 80px); top: 50%; transform: translate(-50%, -50%);">
+          style="left: calc(50% + 90px); top: 50%; transform: translate(-50%, -50%);">
           Non 🙈
         </button>
       </div>
@@ -87,6 +105,8 @@
 
     let tries = 0;
     const maxDodges = 7;
+
+    // ✅ Oui devient VRAIMENT énorme
     let yesScale = 1;
 
     function show(html){
@@ -108,8 +128,16 @@
     }
 
     function growYes() {
-      yesScale += 0.15;
+      // ✅ croissance agressive
+      // Après 7 fuites : ~ 1 + 7*0.45 = 4.15 (ENORME)
+      yesScale += 0.45;
+
+      // Optionnel: plafond très haut (évite un scale absurde si tu changes maxDodges)
+      if (yesScale > 5.5) yesScale = 5.5;
+
       yesBtn.style.transform = `scale(${yesScale})`;
+      // petit bonus: plus ça grossit, plus c’est “important”
+      yesBtn.style.boxShadow = "0 18px 30px rgba(0,0,0,.14)";
     }
 
     function dodge() {
@@ -117,6 +145,7 @@
       noBtn.style.left = x + "px";
       noBtn.style.top  = y + "px";
 
+      // gag : Non rapetisse
       noBtn.classList.remove("tiny", "smaller", "mini");
       if (tries >= 2 && tries < 4) noBtn.classList.add("tiny");
       if (tries >= 4 && tries < 6) noBtn.classList.add("smaller");
@@ -142,20 +171,23 @@
       }
     }
 
+    // Desktop
     noBtn.addEventListener("mouseenter", handleApproach);
+
+    // Mobile: au toucher de Non il fuit + Oui grossit
     noBtn.addEventListener("touchstart", (e) => {
       e.preventDefault();
       handleApproach();
     }, { passive:false });
 
+    // Si elle arrive vraiment à cliquer Non après les fuites -> fin silencieuse
     noBtn.addEventListener("click", () => {
       if (tries < maxDodges) return;
-
-      // Rien ne s'affiche si elle clique vraiment Non
       yesBtn.disabled = true;
       noBtn.disabled = true;
     });
 
+    // ✅ Happy ending DOIT TOUJOURS marcher (même après 100 fuites)
     yesBtn.addEventListener("click", () => {
       show(`
         <strong>YEEES !!! 💞</strong><br/><br/>
@@ -170,6 +202,7 @@
       noBtn.disabled = true;
     });
 
+    // position initiale
     dodge();
   </script>
 </body>
