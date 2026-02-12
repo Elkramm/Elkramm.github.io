@@ -1,178 +1,94 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>💘 Valentine ?</title>
-  <style>
-    :root{ font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    body{
-      margin:0; min-height:100vh; display:grid; place-items:center;
-      background: radial-gradient(circle at top, #ffe1ee, #fff);
-      color:#111;
+<script>
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn  = document.getElementById("noBtn");
+  const msg    = document.getElementById("msg");
+  const stage  = document.getElementById("stage");
+
+  let tries = 0;
+  const maxDodges = 7;
+  let yesScale = 1;
+
+  function show(html){
+    msg.innerHTML = html;
+    msg.style.display = "block";
+  }
+
+  function randomPos() {
+    const s = stage.getBoundingClientRect();
+    const b = noBtn.getBoundingClientRect();
+    const pad = 8;
+
+    const maxX = s.width - b.width - pad * 2;
+    const maxY = s.height - b.height - pad * 2;
+
+    const x = pad + Math.random() * Math.max(0, maxX);
+    const y = pad + Math.random() * Math.max(0, maxY);
+    return { x, y };
+  }
+
+  function dodge() {
+    const { x, y } = randomPos();
+    noBtn.style.left = x + "px";
+    noBtn.style.top  = y + "px";
+  }
+
+  function growYesButton() {
+    yesScale += 0.15; 
+    yesBtn.style.transform = `scale(${yesScale})`;
+  }
+
+  function handleApproach() {
+    if (tries < maxDodges) {
+      tries++;
+      dodge();
+      growYesButton();
+
+      const lines = [
+        "😳 Oupsi…",
+        "😂 Presque !",
+        "🙈 Non est timide…",
+        "😅 Attends attends…",
+        "🥺 Mais pourquoi non…",
+        "🤭 Tu insistes hein !",
+        "😌 Ok ok… tu peux vraiment cliquer si tu veux."
+      ];
+
+      show(lines[Math.min(tries - 1, lines.length - 1)]);
     }
-    .card{
-      width:min(620px, 92vw);
-      background:#ffffffcc;
-      border:1px solid #ffd0e2;
-      border-radius:22px;
-      box-shadow: 0 16px 40px rgba(0,0,0,.10);
-      padding:28px;
-      text-align:center;
-      position:relative;
-      overflow:hidden;
-    }
-    h1{ margin:0 0 10px; font-size: clamp(24px, 4.2vw, 38px); }
-    p{ margin:0 0 18px; font-size: 16px; line-height:1.45; }
-    .stage{ position:relative; height:170px; }
-    .buttons{
-      position:absolute; inset:0;
-      display:flex; gap:14px; justify-content:center; align-items:center;
-      flex-wrap:wrap;
-    }
-    button{
-      border:0; padding:12px 18px; border-radius:999px; cursor:pointer;
-      font-weight:800; font-size:16px;
-      transition: transform .15s ease, box-shadow .15s ease;
-      user-select:none;
-    }
-    button:hover{ transform: translateY(-1px); box-shadow: 0 10px 18px rgba(0,0,0,.10); }
-    .yes{ background:#ff2f74; color:#fff; }
-    .no{ background:#f2f2f2; color:#333; position:absolute; }
-    .msg{
-      margin-top:14px;
-      padding:12px 14px;
-      border-radius:14px;
-      background:#fff;
-      border:1px solid #eee;
-      display:none;
-      text-align:left;
-    }
-    .sparkle{
-      position:absolute; inset:auto -60px -60px auto;
-      width:180px; height:180px; background:#ffd0e2;
-      border-radius: 36px; transform: rotate(18deg);
-      opacity:.55;
-    }
-    .tiny{ transform: scale(.92); }
-    .smaller{ transform: scale(.84); }
-    .mini{ transform: scale(.76); }
-  </style>
-</head>
-<body>
-  <div class="card" id="card">
-    <div class="sparkle" aria-hidden="true"></div>
+  }
 
-    <h1>Tu veux être ma Valentine ? 💘</h1>
-    <p>Promis c’est une question sérieuse… avec un site un peu pas sérieux 😇</p>
+  noBtn.addEventListener("mouseenter", handleApproach);
+  noBtn.addEventListener("touchstart", (e) => { 
+    e.preventDefault(); 
+    handleApproach(); 
+  }, { passive:false });
 
-    <div class="stage" id="stage">
-      <div class="buttons">
-        <button class="yes" id="yesBtn">Oui 😍</button>
-        <button class="no" id="noBtn" style="left: calc(50% + 80px); top: 50%; transform: translate(-50%, -50%);">
-          Non 🙈
-        </button>
-      </div>
-    </div>
+  noBtn.addEventListener("click", () => {
+    if (tries < maxDodges) return;
 
-    <div class="msg" id="msg"></div>
-  </div>
+    show(`
+      <strong>Ok ❤️</strong><br/>
+      Merci d’être honnête.<br/><br/>
+      On peut quand même faire quelque chose de cool 🙂
+    `);
 
-  <script>
-    const yesBtn = document.getElementById("yesBtn");
-    const noBtn  = document.getElementById("noBtn");
-    const msg    = document.getElementById("msg");
-    const stage  = document.getElementById("stage");
+    yesBtn.disabled = true;
+    noBtn.disabled = true;
+  });
 
-    let tries = 0;
-    const maxDodges = 7; // nombre de "fuites" avant que "Non" redevienne simple à cliquer
+  yesBtn.addEventListener("click", () => {
+    show(`
+      <strong>YEEES 💞</strong><br/><br/>
+      Que vais-je bien pouvoir t’offrir ? :<br/><br/>
+      🌕 La lune<br/>
+      🙂‍↕️ Moi<br/>
+      🦆 Un canard en plastique nommé Gérard
+    `);
 
-    function show(html){
-      msg.innerHTML = html;
-      msg.style.display = "block";
-    }
+    yesBtn.disabled = true;
+    noBtn.disabled = true;
+  });
 
-    function randomPos() {
-      const s = stage.getBoundingClientRect();
-      const b = noBtn.getBoundingClientRect();
-      const pad = 8;
+  dodge();
+</script>
 
-      const maxX = s.width - b.width - pad * 2;
-      const maxY = s.height - b.height - pad * 2;
-
-      const x = pad + Math.random() * Math.max(0, maxX);
-      const y = pad + Math.random() * Math.max(0, maxY);
-      return { x, y };
-    }
-
-    function dodge() {
-      const { x, y } = randomPos();
-      noBtn.style.left = x + "px";
-      noBtn.style.top  = y + "px";
-
-      // petit gag : le bouton rapetisse un peu avec le temps
-      noBtn.classList.remove("tiny", "smaller", "mini");
-      if (tries >= 2 && tries < 4) noBtn.classList.add("tiny");
-      if (tries >= 4 && tries < 6) noBtn.classList.add("smaller");
-      if (tries >= 6) noBtn.classList.add("mini");
-    }
-
-    // Survol/touch -> il fuit, mais pas à l'infini
-    function handleApproach() {
-      if (tries < maxDodges) {
-        tries++;
-        dodge();
-
-        const lines = [
-          "😳 Oupsi…",
-          "😂 Tu m’as presque eu !",
-          "🙈 Non est timide aujourd’hui…",
-          "😅 Attends attends…",
-          "🥺 Mais pourquoi non…",
-          "🤭 Tu insistes hein !",
-          "😌 Ok ok… tu peux cliquer si tu veux vraiment."
-        ];
-        show(lines[Math.min(tries - 1, lines.length - 1)]);
-      }
-    }
-
-    noBtn.addEventListener("mouseenter", handleApproach);
-    noBtn.addEventListener("touchstart", (e) => { e.preventDefault(); handleApproach(); }, { passive:false });
-
-    // Après maxDodges, le bouton "Non" devient normal (cliquable sans fuite)
-    noBtn.addEventListener("click", () => {
-      if (tries < maxDodges) return; // tant qu'il fuit encore, le clic ne "valide" pas (mais il ne bloque pas indéfiniment)
-      show(`
-        <strong>Ok ❤️</strong><br/>
-        Merci d’être honnête. Je respecte totalement.<br/><br/>
-        Si tu veux, on peut quand même faire une soirée chill :
-        <ul>
-          <li>🍿 Film + snacks</li>
-          <li>🧋 Bubble tea + balade</li>
-          <li>🍰 Dessert quelque part</li>
-        </ul>
-      `);
-      yesBtn.disabled = true;
-      noBtn.disabled = true;
-    });
-
-    yesBtn.addEventListener("click", () => {
-      show(`
-        <strong>YEEES !!! 💞</strong><br/>
-        Ok c’est officiel 😌<br/><br/>
-        Dis-moi ce que tu préfères :
-        <ul>
-          <li>🍣 resto / takeout</li>
-          <li>🎬 cinéma ou Netflix</li>
-          <li>🕯️ soirée cosy + dessert</li>
-        </ul>
-      `);
-      yesBtn.disabled = true;
-      noBtn.disabled = true;
-    });
-
-    // position initiale propre sur mobile
-    dodge();
-  </script>
-</body>
-</html>
