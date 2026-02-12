@@ -130,7 +130,7 @@
     function growYes() {
       // ✅ croissance agressive
       // Après 7 fuites : ~ 1 + 7*0.45 = 4.15 (ENORME)
-      yesScale += 0.45;
+      yesScale += 0.25;
 
       // Optionnel: plafond très haut (évite un scale absurde si tu changes maxDodges)
       if (yesScale > 5.5) yesScale = 5.5;
@@ -165,7 +165,7 @@
           "😅 Attends attends…",
           "🥺 Mais pourquoi non…",
           "🤭 Tu insistes hein !",
-          "😌 Ok ok… tu peux cliquer si tu veux vraiment."
+          "😌 En vrai ton consetement je vais m'en passer."
         ];
         show(lines[Math.min(tries - 1, lines.length - 1)]);
       }
