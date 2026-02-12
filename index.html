@@ -25,7 +25,7 @@
     h1{ margin:0 0 10px; font-size: clamp(24px, 4.2vw, 38px); }
     p{ margin:0 0 18px; font-size: 16px; line-height:1.45; }
 
-    .stage{ position:relative; height:190px; } /* un peu plus haut pour laisser “Oui” grossir */
+    .stage{ position:relative; height:190px; }
     .buttons{
       position:absolute; inset:0;
       display:flex; gap:14px; justify-content:center; align-items:center;
@@ -45,14 +45,14 @@
     .yes{
       background:#ff2f74; color:#fff;
       position:relative;
-      z-index: 5;              /* ✅ Oui au-dessus */
-      padding: 14px 22px;      /* ✅ un peu plus “costaud” de base */
+      z-index: 5;
+      padding: 14px 22px;
     }
 
     .no{
       background:#f2f2f2; color:#333;
       position:absolute;
-      z-index: 2;              /* ✅ Non en dessous */
+      z-index: 2;
     }
 
     .msg{
@@ -105,8 +105,6 @@
 
     let tries = 0;
     const maxDodges = 7;
-
-    // ✅ Oui devient VRAIMENT énorme
     let yesScale = 1;
 
     function show(html){
@@ -128,15 +126,9 @@
     }
 
     function growYes() {
-      // ✅ croissance agressive
-      // Après 7 fuites : ~ 1 + 7*0.45 = 4.15 (ENORME)
       yesScale += 0.1;
-
-      // Optionnel: plafond très haut (évite un scale absurde si tu changes maxDodges)
       if (yesScale > 3) yesScale = 3;
-
       yesBtn.style.transform = `scale(${yesScale})`;
-      // petit bonus: plus ça grossit, plus c’est “important”
       yesBtn.style.boxShadow = "0 18px 30px rgba(0,0,0,.14)";
     }
 
@@ -145,7 +137,6 @@
       noBtn.style.left = x + "px";
       noBtn.style.top  = y + "px";
 
-      // gag : Non rapetisse
       noBtn.classList.remove("tiny", "smaller", "mini");
       if (tries >= 2 && tries < 4) noBtn.classList.add("tiny");
       if (tries >= 4 && tries < 6) noBtn.classList.add("smaller");
@@ -165,29 +156,24 @@
           "😅 Attends attends…",
           "🥺 Mais pourquoi non…",
           "🤭 Tu insistes hein !",
-          "😌 En vrai ton consentement je vais m'en passer."
+          "😌 Ok ok… je te laisse le choix, promis."
         ];
         show(lines[Math.min(tries - 1, lines.length - 1)]);
       }
     }
 
-    // Desktop
     noBtn.addEventListener("mouseenter", handleApproach);
-
-    // Mobile: au toucher de Non il fuit + Oui grossit
     noBtn.addEventListener("touchstart", (e) => {
       e.preventDefault();
       handleApproach();
     }, { passive:false });
 
-    // Si elle arrive vraiment à cliquer Non après les fuites -> fin silencieuse
     noBtn.addEventListener("click", () => {
       if (tries < maxDodges) return;
       yesBtn.disabled = true;
       noBtn.disabled = true;
     });
 
-    // ✅ Happy ending DOIT TOUJOURS marcher (même après 100 fuites)
     yesBtn.addEventListener("click", () => {
       show(`
         <strong>YEEES !!! 💞</strong><br/><br/>
@@ -197,12 +183,44 @@
           <li>🙂‍↕️ Moi</li>
           <li>👩‍🎓 Une université sérieuse</li>
         </ul>
+        <br/>
+        <button id="infoBtn" style="background:#111;color:#fff;border:0;padding:12px 16px;border-radius:999px;font-weight:800;cursor:pointer;">
+          Entrer mes informations
+        </button>
       `);
       yesBtn.disabled = true;
       noBtn.disabled = true;
     });
 
-    // position initiale
+    document.addEventListener("click", (e) => {
+      if (e.target && e.target.id === "infoBtn") {
+        const prenom = prompt("Ton prénom ?") || "";
+        const nom = prompt("Ton nom ?") || "";
+        const fleur = prompt("Ta fleur préférée ? 🌸") || "";
+        const chocolat = prompt("Ton chocolat préféré ? 🍫") || "";
+
+        show(`
+          <strong>Informations enregistrées 💌</strong><br/><br/>
+          <ul>
+            <li><strong>Prénom :</strong> ${escapeHtml(prenom)}</li>
+            <li><strong>Nom :</strong> ${escapeHtml(nom)}</li>
+            <li><strong>Fleur préférée :</strong> ${escapeHtml(fleur)}</li>
+            <li><strong>Chocolat préféré :</strong> ${escapeHtml(chocolat)}</li>
+          </ul>
+          <em>Parfait… je prends note 😌💞</em>
+        `);
+      }
+    });
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
     dodge();
   </script>
 </body>
